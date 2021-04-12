@@ -273,6 +273,12 @@ inline void PL(char* baseAddress);
 inline void SP(char* baseAddress);
 inline void DC(char* baseAddress);
 
+struct Chest
+{
+	int offset;
+	short value;
+};
+
 extern "C"
 {
 	short __declspec(dllexport) GoA_GetCurrentMap()
@@ -280,11 +286,9 @@ extern "C"
 		return ReadShort(CurrentMapAddress);
 	}
 
-	void __declspec(dllexport) GoA_SetChestItem(char *param)
+	void __declspec(dllexport) GoA_SetChestItem(Chest *chest)
 	{
-		int offset = *(int*)param;
-		short value = *((short*)(param + sizeof(int)));
-		WriteShort(BaseAddress + offset, value);
+		WriteShort(BaseAddress + chest->offset, chest->value);
 	}
 
 	void __declspec(dllexport) GoA_SetDrive(char *value)

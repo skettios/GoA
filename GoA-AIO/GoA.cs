@@ -63,7 +63,6 @@ namespace GoA
         {
             KH2Handle = IntPtr.Zero;
             DLLPath = Directory.GetCurrentDirectory() + "\\GoA.dll";
-            DLLHandle = Native.LoadLibrary(DLLPath);
 
             DriveParamPtr = IntPtr.Zero;
         }
@@ -112,6 +111,8 @@ namespace GoA
 
         public void Run()
         {
+            DLLHandle = Native.LoadLibrary("GoA.dll");
+
             IntPtr funcPtr = Native.GetProcAddress(DLLHandle, "GoA_Run");
             IntPtr threadHandle = Native.CreateRemoteThread(KH2Handle, IntPtr.Zero, 0, funcPtr, IntPtr.Zero, 0, IntPtr.Zero);
             if (threadHandle != IntPtr.Zero)
@@ -137,21 +138,39 @@ namespace GoA
             }
         }
 
+        struct Chest
+        {
+            public int offset;
+            public short value;
+        }
+
         public void SetChestItem(int offset, short value)
         {
-            uint writeSize = (uint)(Marshal.SizeOf<int>() + Marshal.SizeOf<short>());
-
             if (SetChestItemParamPtr == IntPtr.Zero)
-                SetChestItemParamPtr = Native.VirtualAllocEx(KH2Handle, IntPtr.Zero, writeSize, Native.MEM_ALL, Native.PAGE_READWRITE);
+                SetChestItemParamPtr = Native.VirtualAllocEx(KH2Handle, IntPtr.Zero, (uint)Marshal.SizeOf<Chest>(), Native.MEM_ALL, Native.PAGE_READWRITE);
 
             if (SetChestItemPtr == IntPtr.Zero)
                 SetChestItemPtr = Native.GetProcAddress(DLLHandle, "GoA_SetChestItem");
 
+            Chest chest = new Chest()
+            {
+                offset = offset,
+                value = value
+            };
+
+            //TODO(skettios): better way to do this?
+            byte[] bytes = new byte[Marshal.SizeOf<Chest>()];
+            IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<Chest>());
+            Marshal.StructureToPtr(chest, ptr, true);
+            Marshal.Copy(ptr, bytes, 0, Marshal.SizeOf<Chest>());
+            Marshal.FreeHGlobal(ptr);
+
             UIntPtr bytesWritten;
-            Native.WriteProcessMemory(KH2Handle, SetChestItemParamPtr, BitConverter.GetBytes(offset), (uint)Marshal.SizeOf<int>(), out bytesWritten);
-            Native.WriteProcessMemory(KH2Handle, IntPtr.Add(SetChestItemParamPtr, Marshal.SizeOf<int>()), BitConverter.GetBytes(value), (uint)Marshal.SizeOf<short>(), out bytesWritten);
+            Native.WriteProcessMemory(KH2Handle, SetChestItemParamPtr, bytes, (uint)Marshal.SizeOf<Chest>(), out bytesWritten);
 
             IntPtr threadHandle = Native.CreateRemoteThread(KH2Handle, IntPtr.Zero, 0, SetChestItemPtr, SetChestItemParamPtr, 0, IntPtr.Zero);
+            if (threadHandle != IntPtr.Zero)
+                Native.CloseHandle(threadHandle);
         }
 
         /*
