@@ -2,12 +2,14 @@
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace GoA
 {
     public partial class Form1 : Form
     {
         private Timer _waitProcTimer;
+        private Timer _checkProcTimer;
         private GoA _GoA;
 
         public Form1()
@@ -15,33 +17,58 @@ namespace GoA
             InitializeComponent();
         }
 
+        private void OnKH2Exit()
+        {
+            _GoA.Reset();
+            _waitProcTimer.Start();
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             _GoA = new GoA();
-
             _waitProcTimer = new Timer
             {
                 Interval = 100
             };
-            _waitProcTimer.Tick += Timer_Tick;
+
+            _checkProcTimer = new Timer
+            {
+                Interval = 100
+            };
+
+            _waitProcTimer.Tick += Wait_Tick;
+            _checkProcTimer.Tick += Check_Tick;
+
             _waitProcTimer.Start();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Check_Tick(object sender, EventArgs e)
+        {
+            Process[] processes = Process.GetProcessesByName("KINGDOM HEARTS II FINAL MIX");
+            if (processes.Length == 0)
+            {
+                OnKH2Exit();
+                _checkProcTimer.Stop();
+            }
+        }
+
+        private void Wait_Tick(object sender, EventArgs e)
         {
             label1.Text = "Waiting for KINGDOM HEARTS II FINAL MIX";
 
-            int procId = _GoA.GetProcessId("KINGDOM HEARTS II FINAL MIX");
-            if (procId != 0)
+            Process[] processes = Process.GetProcessesByName("KINGDOM HEARTS II FINAL MIX");
+            if (processes.Length > 0)
             {
-                if (_GoA.Inject(procId))
+                Process process = processes[0];
+                if (_GoA.Inject(process.Id))
                 {
                     _GoA.Run();
 
                     label1.Text = "GoA.dll injected!";
                     _waitProcTimer.Stop();
+                    _checkProcTimer.Start();
                 }
-            }
+            }    
         }
 
         private void button2_Click(object sender, EventArgs e)

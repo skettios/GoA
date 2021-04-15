@@ -12,6 +12,9 @@ namespace GoA
         public static extern IntPtr LoadLibrary(string dll);
 
         [DllImport("kernel32.dll")]
+        public static extern bool FreeLibrary(IntPtr handle);
+
+        [DllImport("kernel32.dll")]
         public static extern IntPtr OpenProcess(int access, bool inherit, int procId);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
@@ -67,16 +70,12 @@ namespace GoA
             DriveParamPtr = IntPtr.Zero;
         }
 
-        public int GetProcessId(string procName)
+        public void Reset()
         {
-            int ret = 0;
-            Process[] targetProcesses = Process.GetProcessesByName(procName);
-            if (targetProcesses.Length > 0)
-                ret = targetProcesses[0].Id;
-
-            return ret;
+            Native.FreeLibrary(DLLHandle);
+            Native.CloseHandle(KH2Handle);
+            KH2Handle = IntPtr.Zero;
         }
-
         public bool Inject(int procId)
         {
             if (KH2Handle != IntPtr.Zero)
