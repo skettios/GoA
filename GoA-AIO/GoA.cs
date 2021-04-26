@@ -112,7 +112,7 @@ namespace GoA
         {
             DLLHandle = Native.LoadLibrary("GoA.dll");
 
-            IntPtr funcPtr = Native.GetProcAddress(DLLHandle, "GoA_Run");
+            IntPtr funcPtr = Native.GetProcAddress(DLLHandle, "GoA_Lua");
             IntPtr threadHandle = Native.CreateRemoteThread(KH2Handle, IntPtr.Zero, 0, funcPtr, IntPtr.Zero, 0, IntPtr.Zero);
             if (threadHandle != IntPtr.Zero)
                 Native.CloseHandle(threadHandle);

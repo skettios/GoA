@@ -27,6 +27,9 @@
     <ClCompile Include="LoD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="STT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Helpers.h">

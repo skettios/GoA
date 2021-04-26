@@ -14,23 +14,26 @@ void GoA()
 {
 	if (Place == 0x1A04)
 	{
-		WriteString(Object00Address + 0x13450, "SHOP_POINT\0");
-		WriteString(Object00Address + 0x13470, "N_EX960_RTN.mset\0");
-		WriteShort(System03Address + 0x16F40, 0x001);
-		WriteShort(System03Address + 0x16F42, 0x003);
+		if (PrevPlace != 0x1A04 && Read<short>(SaveAddress + 0x3524) > 0)
+			RefillDrive();
+
+		Write<const char *>(Object00Address + 0x13450, "SHOP_POINT\0");
+		Write<const char *>(Object00Address + 0x13470, "N_EX960_RTN.mset\0");
+		Write<short>(System03Address + 0x16F40, 0x001);
+		Write<short>(System03Address + 0x16F42, 0x003);
 
 		// Middle Chest
-		if (ReadShort(SaveAddress + 0x06AC) == 0x02)
-			WriteShort(SaveAddress + 0x06AC, 0x00);
+		if (Read<short>(SaveAddress + 0x06AC) == 0x02)
+			Write<short>(SaveAddress + 0x06AC, 0x00);
 
 		// Right Chest
 		SpawnObj<float>(0x07, 0x038, -160);
 		SpawnObj<float>(0x07, 0x040, 360);
-		SpawnObj<float>(0x07, 0x048, M_PI / 2.f);
+		SpawnObj<float>(0x07, 0x048, (float)M_PI / 2.f);
 		// Left Chest
 		SpawnObj<float>(0x07, 0x078, -160);
 		SpawnObj<float>(0x07, 0x080, -360);
-		SpawnObj<float>(0x07, 0x088, M_PI / 2.f);
+		SpawnObj<float>(0x07, 0x088, (float)M_PI / 2.f);
 		// Save Point & Moogle Shop
 		int Spawn = 0;
 		int File = 0x02;
@@ -91,10 +94,10 @@ void GoA()
 	}
 	else
 	{
-		WriteString(Object00Address + 0x13450, "N_EX700_TT_WEAPON_RTN");
-		WriteString(Object00Address + 0x13470, "N_EX700_SHOP_RTN.mset");
-		WriteShort(System03Address + 0x16F40, 0x094);
-		WriteShort(System03Address + 0x16F42, 0x08B);
+		Write<const char *>(Object00Address + 0x13450, "N_EX700_TT_WEAPON_RTN");
+		Write<const char *>(Object00Address + 0x13470, "N_EX700_SHOP_RTN.mset");
+		Write<short>(System03Address + 0x16F40, 0x094);
+		Write<short>(System03Address + 0x16F42, 0x08B);
 	}
 
 	// World Map->Garden of Assemblage
@@ -116,18 +119,18 @@ void GoA()
 			Warp(0x04, 0x1A, 0x1B, 0x00, 0x00, 0x02);
 		else if (Door == 0x01) //Twilight Town
 		{
-			if (ReadByte(SaveAddress + 0x1CFF) == 8) //Twilight Town
+			if (Read<char>(SaveAddress + 0x1CFF) == 8) //Twilight Town
 				Warp(0x04, 0x1A, 0x1C, 0x00, 0x00, 0x02);
-			else if (ReadByte(SaveAddress + 0x1CFF) == 13) //Simulated Twilight Town
+			else if (Read<char>(SaveAddress + 0x1CFF) == 13) //Simulated Twilight Town
 				Warp(0x04, 0x1A, 0x21, 0x00, 0x00, 0x02);
 
-			WriteByte(SaveAddress + 0x1CFF, 0);
+			Write<char>(SaveAddress + 0x1CFF, 0);
 		}
 		else if (Door == 0x02) //Hollow Bastion
 		{
 			Warp(0x04, 0x1A, 0x1D, 0x00, 0x00, 0x02);
-			if (ReadByte(SaveAddress + 0x1D2F) == 1) //During Ravine Heartless
-				WriteInt(SaveAddress + 0x3544, 0x12020100); //Add Goofy
+			if (Read<char>(SaveAddress + 0x1D2F) == 1) //During Ravine Heartless
+				Write<int>(SaveAddress + 0x3544, 0x12020100); //Add Goofy
 		}
 		else if (Door == 0x08) //Port Royal
 			Warp(0x04, 0x1A, 0x1E, 0x00, 0x00, 0x02);
@@ -156,12 +159,12 @@ void GoA()
 			Warp(0x04, 0x1A, 0x1B, 0x00, 0x00, 0x02);
 		else if (PrevWorld == 0x02)
 		{
-			if (ReadByte(SaveAddress + 0x1CFF) == 8)
+			if (Read<char>(SaveAddress + 0x1CFF) == 8)
 				Warp(0x04, 0x1A, 0x1C, 0x00, 0x00, 0x02); // tt
-			else if (ReadByte(SaveAddress + 0x1CFF) == 13)
+			else if (Read<char>(SaveAddress + 0x1CFF) == 13)
 				Warp(0x04, 0x1A, 0x21, 0x00, 0x00, 0x02); // stt
 
-			WriteByte(SaveAddress + 0x1CFF, 0);
+			Write<char>(SaveAddress + 0x1CFF, 0);
 		}
 		else if (PrevWorld == 0x04) // hb
 			Warp(0x04, 0x1A, 0x1D, 0x00, 0x00, 0x02);
@@ -178,16 +181,16 @@ extern "C"
 {
 	short __declspec(dllexport) GoA_GetCurrentMap()
 	{
-		return ReadShort(CurrentMapAddress);
+		return Read<short>(CurrentMapAddress);
 	}
 
 	void __declspec(dllexport) GoA_SetChestItem(Chest *chest)
 	{
-		WriteShort(BaseAddress + chest->offset, chest->value);
+		Write<short>(BaseAddress + chest->offset, chest->value);
 	}
 
 	void __declspec(dllexport) GoA_SetDrive(char *value)
 	{
-		WriteByte(Slot1Address + 0x1B1, *value);
+		Write<char>(Slot1Address + 0x1B1, *value);
 	}
 }

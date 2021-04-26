@@ -5,60 +5,60 @@ void LoD()
 {
 	if (Place == 0x0A12)
 	{
-		if (Map == 0x6B && Battle == 0x6B && Event == 0x6B) // LoD
+		if (IsEvent(0x6B, 0x6B, 0x6B)) // LoD
 		{
-			if ((ReadByte(SaveAddress + 0x1D90) & (~0x01)) == 0x00)
+			if ((Read<char>(SaveAddress + 0x1D90) & (~0x01)) == 0x00)
 				Warp(0x08, 0x00, 0x00, 0x01, 0x00, 0x01);
-			if (ReadShort(SaveAddress + 0x0C1A) == 0x01) // Before Encampment Heartless
+			if (Read<short>(SaveAddress + 0x0C1A) == 0x01) // Before Encampment Heartless
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x13);
-			if (ReadShort(SaveAddress + 0x0C1A) == 0x04) //Before Missions
+			if (Read<short>(SaveAddress + 0x0C1A) == 0x04) //Before Missions
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C1A) == 0x10)//During Missions 1
+			if (Read<short>(SaveAddress + 0x0C1A) == 0x10)//During Missions 1
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C1A) == 0x11) //During Missions 2
+			if (Read<short>(SaveAddress + 0x0C1A) == 0x11) //During Missions 2
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C1A) == 0x12) //During Missions 3
+			if (Read<short>(SaveAddress + 0x0C1A) == 0x12) //During Missions 3
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C26) == 0x01) //Before Mountain Climb
+			if (Read<short>(SaveAddress + 0x0C26) == 0x01) //Before Mountain Climb
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x10);
-			if (ReadShort(SaveAddress + 0x0C32) == 0x01) //Before Village Cave Heartless
+			if (Read<short>(SaveAddress + 0x0C32) == 0x01) //Before Village Cave Heartless
 				Warp(0x08, 0x04, 0x63, 0x00, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C3E) == 0x01) //Before Summit Rapid Heartless
+			if (Read<short>(SaveAddress + 0x0C3E) == 0x01) //Before Summit Rapid Heartless
 				Warp(0x08, 0x0C, 0x63, 0x01, 0x00, 0x16);
-			if (ReadShort(SaveAddress + 0x0C20) == 0x03) //After Summit Heartless
+			if (Read<short>(SaveAddress + 0x0C20) == 0x03) //After Summit Heartless
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x14);
-			if (ReadShort(SaveAddress + 0x0C44) == 0x01) //Before Imperial Square Heartless I
+			if (Read<short>(SaveAddress + 0x0C44) == 0x01) //Before Imperial Square Heartless I
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x14);
-			if (ReadShort(SaveAddress + 0x0C4A) == 0x01) //Before Shan Yu
+			if (Read<short>(SaveAddress + 0x0C4A) == 0x01) //Before Shan Yu
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x14);
-			if (ReadShort(SaveAddress + 0x0C14) == 0x11) //Post 1st Visit
+			if (Read<short>(SaveAddress + 0x0C14) == 0x11) //Post 1st Visit
 				Warp(0x08, 0x0C, 0x63, 0x00, 0x00, 0x14);
-			if (ReadShort(SaveAddress + 0x0C14) == 0x11 && ReadByte(SaveAddress + 0x35AF) > 0) //2nd Visit
+			if (Read<short>(SaveAddress + 0x0C14) == 0x11 && Read<char>(SaveAddress + 0x35AF) > 0) //2nd Visit
 			{
 				Warp(0x08, 0x0C, 0x00, 0x00, 0x00, 0x0A);
-				WriteShort(SaveAddress + 0x0C14, 0x12); //Bamboo Grove EVT
-				WriteShort(SaveAddress + 0x0C18, 0x0A); //Encampment BTL
-				WriteShort(SaveAddress + 0x0C1E, 0x0A); //Checkpoint BTL
-				WriteShort(SaveAddress + 0x0C24, 0x0A); //Mountain Trail BTL
-				WriteShort(SaveAddress + 0x0C30, 0x0A); //Village Cave BTL
-				WriteShort(SaveAddress + 0x0C42, 0x0A); //Imperial Square BTL
-				WriteShort(SaveAddress + 0x0C48, 0x0A); //Palace Gate BTL
+				Write<short>(SaveAddress + 0x0C14, 0x12); //Bamboo Grove EVT
+				Write<short>(SaveAddress + 0x0C18, 0x0A); //Encampment BTL
+				Write<short>(SaveAddress + 0x0C1E, 0x0A); //Checkpoint BTL
+				Write<short>(SaveAddress + 0x0C24, 0x0A); //Mountain Trail BTL
+				Write<short>(SaveAddress + 0x0C30, 0x0A); //Village Cave BTL
+				Write<short>(SaveAddress + 0x0C42, 0x0A); //Imperial Square BTL
+				Write<short>(SaveAddress + 0x0C48, 0x0A); //Palace Gate BTL
 			}
-			if (ReadShort(SaveAddress + 0x0C5C) == 0x15) //Before Riku
+			if (Read<short>(SaveAddress + 0x0C5C) == 0x15) //Before Riku
 				Warp(0x08, 0x0C, 0x63, 0x00, 0x00, 0x15);
-			if (ReadShort(SaveAddress + 0x0C44) == 0x0A) //Before Imperial Square Heartless II
+			if (Read<short>(SaveAddress + 0x0C44) == 0x0A) //Before Imperial Square Heartless II
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x15);
-			if (ReadShort(SaveAddress + 0x0C4A) == 0x0A) //After Imperial Square Heartless II
+			if (Read<short>(SaveAddress + 0x0C4A) == 0x0A) //After Imperial Square Heartless II
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x15);
-			if (ReadShort(SaveAddress + 0x0C50) == 0x0B) //Before Antechamber Nobodies
+			if (Read<short>(SaveAddress + 0x0C50) == 0x0B) //Before Antechamber Nobodies
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x15);
-			if (ReadShort(SaveAddress + 0x0C50) == 0x0D) //Before Storm Rider
+			if (Read<short>(SaveAddress + 0x0C50) == 0x0D) //Before Storm Rider
 				Warp(0x08, 0x0B, 0x63, 0x00, 0x00, 0x16);
-			if (ReadByte(SaveAddress + 0x1D9E) == 1) //Post 2nd Visit 1
+			if (Read<char>(SaveAddress + 0x1D9E) == 1) //Post 2nd Visit 1
 				Warp(0x08, 0x00, 0x63, 0x00, 0x00, 0x00);
-			else if (ReadByte(SaveAddress + 0x1D9E) == 2) //Post 2nd Visit 2
+			else if (Read<char>(SaveAddress + 0x1D9E) == 2) //Post 2nd Visit 2
 				Warp(0x08, 0x04, 0x63, 0x00, 0x00, 0x14);
-			else if (ReadByte(SaveAddress + 0x1D9E) == 3) //Post 2nd Visit 3
+			else if (Read<char>(SaveAddress + 0x1D9E) == 3) //Post 2nd Visit 3
 				Warp(0x08, 0x0B, 0x63, 0x00, 0x00, 0x15);
 		}
 	}
@@ -69,24 +69,24 @@ void LoD()
 
 		BitOr(SaveAddress + 0x1ED9, 0x80);
 
-		WriteByte(SaveAddress + 0x1D9E, 0x02);
-		WriteShort(SaveAddress + 0x0C14, 0x00);
-		WriteShort(SaveAddress + 0x0C1C, 0x00);
-		WriteShort(SaveAddress + 0x0C22, 0x00);
-		WriteShort(SaveAddress + 0x0C2C, 0x14);
-		WriteShort(SaveAddress + 0x0C2E, 0x01);
-		WriteShort(SaveAddress + 0x0C34, 0x02);
-		WriteShort(SaveAddress + 0x0C42, 0x0A);
-		WriteShort(SaveAddress + 0x0C48, 0x01);
-		WriteShort(SaveAddress + 0x0C4E, 0x0A);
-		WriteShort(SaveAddress + 0x0C56, 0x15);
-		WriteShort(SaveAddress + 0x0C5C, 0x14);
-		WriteShort(SaveAddress + 0x1FB8, 0x0000);
+		Write<char>(SaveAddress + 0x1D9E, 0x02);
+		Write<short>(SaveAddress + 0x0C14, 0x00);
+		Write<short>(SaveAddress + 0x0C1C, 0x00);
+		Write<short>(SaveAddress + 0x0C22, 0x00);
+		Write<short>(SaveAddress + 0x0C2C, 0x14);
+		Write<short>(SaveAddress + 0x0C2E, 0x01);
+		Write<short>(SaveAddress + 0x0C34, 0x02);
+		Write<short>(SaveAddress + 0x0C42, 0x0A);
+		Write<short>(SaveAddress + 0x0C48, 0x01);
+		Write<short>(SaveAddress + 0x0C4E, 0x0A);
+		Write<short>(SaveAddress + 0x0C56, 0x15);
+		Write<short>(SaveAddress + 0x0C5C, 0x14);
+		Write<short>(SaveAddress + 0x1FB8, 0x0000);
 	}
 
-	if (Place == 0x0708 && IsEvent(0x01, 0x00, 0x02) && ReadInt(CutsceneLengthAddress) == 0x064)
+	if (Place == 0x0708 && IsEvent(0x01, 0x00, 0x02) && Read<int>(CutsceneLengthAddress) == 0x064)
 	{
-		if (ReadShort(SaveAddress + 0x3524) > 0)
+		if (Read<short>(SaveAddress + 0x3524) > 0)
 			RefillDrive();
 	}
 }
