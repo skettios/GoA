@@ -103,7 +103,10 @@ namespace GoA
             if (threadHandle == IntPtr.Zero)
                 return false;
             else
+            {
                 Native.CloseHandle(threadHandle);
+                Native.CloseHandle(loadLibraryAddress);
+            }
 
             return true;
         }
@@ -112,10 +115,20 @@ namespace GoA
         {
             DLLHandle = Native.LoadLibrary("GoA.dll");
 
+            string scriptsDir = Directory.GetCurrentDirectory() + "\\scripts";
+
+            UIntPtr bytesWritten;
+
+            IntPtr stringAddress = Native.VirtualAllocEx(KH2Handle, IntPtr.Zero, (uint)scriptsDir.Length, Native.MEM_ALL, Native.PAGE_READWRITE);
+            Native.WriteProcessMemory(KH2Handle, stringAddress, Encoding.Default.GetBytes(scriptsDir), (uint)scriptsDir.Length, out bytesWritten);
+
             IntPtr funcPtr = Native.GetProcAddress(DLLHandle, "GoA_Lua");
-            IntPtr threadHandle = Native.CreateRemoteThread(KH2Handle, IntPtr.Zero, 0, funcPtr, IntPtr.Zero, 0, IntPtr.Zero);
+            IntPtr threadHandle = Native.CreateRemoteThread(KH2Handle, IntPtr.Zero, 0, funcPtr, stringAddress, 0, IntPtr.Zero);
             if (threadHandle != IntPtr.Zero)
+            {
                 Native.CloseHandle(threadHandle);
+                Native.CloseHandle(stringAddress);
+            }
         }
 
         public void SetDrive(byte value)

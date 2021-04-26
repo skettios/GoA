@@ -4,6 +4,10 @@
 #include "Globals.h"
 #include "Helpers.h"
 
+#include <string>
+#include <iostream>
+#include <filesystem>
+
 extern "C"
 {
 	#include <lua.h>
@@ -224,8 +228,13 @@ void NewGame()
 
 extern "C"
 {
-	void __declspec(dllexport) GoA_Lua()
+	void __declspec(dllexport) GoA_Lua(const char *scriptsDir)
 	{
+		AllocConsole();
+		freopen("CONOUT$", "w", stdout);
+
+		std::cout << scriptsDir << std::endl;
+
 		BaseAddress = (char*)GetModuleHandle(NULL);
 		CurrentLocationAddress = BaseAddress + CurrentLocationOffset;
 		CutsceneLengthAddress = BaseAddress + CutsceneLengthOffset;
@@ -248,47 +257,61 @@ extern "C"
 		GameSpeedAddress = BaseAddress + GameSpeedOffset;
 		Slot1Address = BaseAddress + Slot1Offset;
 
-		lua_State* L = luaL_newstate();
+		std::vector<lua_State*> scripts;
 
-		lua_pushnumber(L, (int64_t)BaseAddress);
-		lua_setglobal(L, "BaseAddress");
+		std::string path(scriptsDir);
+		for (auto& entry : std::filesystem::directory_iterator(path))
+		{
+			if (entry.path().extension().u8string() == ".lua")
+			{
+				lua_State* L = luaL_newstate();
 
-		luaL_openlibs(L);
+				lua_pushnumber(L, (uint64_t)BaseAddress);
+				lua_setglobal(L, "BaseAddress");
 
-		lua_register(L, "ReadByte", LUA_Read<uint8_t>);
-		lua_register(L, "ReadShort", LUA_Read<uint16_t>);
-		lua_register(L, "ReadInt", LUA_Read<uint32_t>);
-		lua_register(L, "ReadLong", LUA_Read<uint64_t>);
-		lua_register(L, "ReadFloat", LUA_Read<float>);
+				luaL_openlibs(L);
+				lua_register(L, "ReadByte", LUA_Read<uint8_t>);
+				lua_register(L, "ReadShort", LUA_Read<uint16_t>);
+				lua_register(L, "ReadInt", LUA_Read<uint32_t>);
+				lua_register(L, "ReadLong", LUA_Read<uint64_t>);
+				lua_register(L, "ReadFloat", LUA_Read<float>);
 
-		lua_register(L, "ReadByteA", LUA_ReadA<uint8_t>);
-		lua_register(L, "ReadShortA", LUA_ReadA<uint16_t>);
-		lua_register(L, "ReadIntA", LUA_ReadA<uint32_t>);
-		lua_register(L, "ReadLongA", LUA_ReadA<uint64_t>);
-		lua_register(L, "ReadFloatA", LUA_ReadA<float>);
+				lua_register(L, "ReadByteA", LUA_ReadA<uint8_t>);
+				lua_register(L, "ReadShortA", LUA_ReadA<uint16_t>);
+				lua_register(L, "ReadIntA", LUA_ReadA<uint32_t>);
+				lua_register(L, "ReadLongA", LUA_ReadA<uint64_t>);
+				lua_register(L, "ReadFloatA", LUA_ReadA<float>);
 
-		lua_register(L, "WriteByte", LUA_Write<uint8_t>);
-		lua_register(L, "WriteShort", LUA_Write<uint16_t>);
-		lua_register(L, "WriteInt", LUA_Write<uint32_t>);
-		lua_register(L, "WriteLong", LUA_Write<uint64_t>);
-		lua_register(L, "WriteFloat", LUA_Write<float>);
+				lua_register(L, "WriteByte", LUA_Write<uint8_t>);
+				lua_register(L, "WriteShort", LUA_Write<uint16_t>);
+				lua_register(L, "WriteInt", LUA_Write<uint32_t>);
+				lua_register(L, "WriteLong", LUA_Write<uint64_t>);
+				lua_register(L, "WriteFloat", LUA_Write<float>);
 
-		lua_register(L, "WriteByteA", LUA_WriteA<uint8_t>);
-		lua_register(L, "WriteShortA", LUA_WriteA<uint16_t>);
-		lua_register(L, "WriteIntA", LUA_WriteA<uint32_t>);
-		lua_register(L, "WriteLongA", LUA_WriteA<uint64_t>);
-		lua_register(L, "WriteFloatA", LUA_WriteA<float>);
+				lua_register(L, "WriteByteA", LUA_WriteA<uint8_t>);
+				lua_register(L, "WriteShortA", LUA_WriteA<uint16_t>);
+				lua_register(L, "WriteIntA", LUA_WriteA<uint32_t>);
+				lua_register(L, "WriteLongA", LUA_WriteA<uint64_t>);
+				lua_register(L, "WriteFloatA", LUA_WriteA<float>);
 
-		lua_register(L, "WriteString", LUA_WriteString);
-		lua_register(L, "WriteStringA", LUA_WriteStringA);
+				lua_register(L, "WriteString", LUA_WriteString);
+				lua_register(L, "WriteStringA", LUA_WriteStringA);
 
-		luaL_dofile(L, "Test GoA v2.lua");
+				luaL_dofile(L, entry.path().u8string().c_str());
+
+				scripts.push_back(L);
+				std::cout << "Found script: " << entry.path() << std::endl;
+			}
+		}
 
 		while (true)
 		{
-			lua_getglobal(L, "_OnFrame");
-			lua_call(L, 0, 0);
-			lua_pop(L, 0);
+			for (auto L : scripts)
+			{
+				lua_getglobal(L, "_OnFrame");
+				lua_call(L, 0, 0);
+				lua_pop(L, 0);
+			}
 
 			Sleep(1);
 		}
